@@ -1,6 +1,6 @@
 HƯỚNG DẪN CHẠY CHƯƠNG TRÌNH
 
-1. Copy thư mục PMNM_68PM4_TranHoangMinh_0196966 vào htdocs của XAMPP.
+1. Copy thư mục PMNM_68PM4_TranHoangMinh_0196966 vào thư mục htdocs của XAMPP.
 
 2. Mở phpMyAdmin.
 
@@ -10,14 +10,65 @@ HƯỚNG DẪN CHẠY CHƯƠNG TRÌNH
 4. Import file:
    68pm34.sql
 
-5. Khởi động Apache và MySQL.
+5. Khởi động Apache và MySQL trong XAMPP.
 
-6. Truy cập:
+6. Truy cập chương trình tại:
+
    http://localhost/PMNM_68PM4_TranHoangMinh_0196966/public/
 
-Tài khoản đăng nhập:
+---
 
-* Username: admin
-* Password: 123456
+## TÀI KHOẢN ĐĂNG NHẬP
+
+Username: admin
+
+Password: 123456
+
+---
+
+## CÁC CHỨC NĂNG ĐÃ THỰC HIỆN
+
+1. Đăng nhập hệ thống
+
+   * Kiểm tra tài khoản đăng nhập.
+   * Chặn truy cập khi chưa đăng nhập.
+   * Đăng xuất khỏi hệ thống.
+
+2. Quản lý sinh viên
+
+   * Xem danh sách sinh viên.
+   * Thêm sinh viên.
+   * Sửa thông tin sinh viên.
+   * Xóa sinh viên.
+   * Tìm kiếm theo:
+
+     * Họ tên
+     * MSSV
+     * Mã lớp
+     * Tên lớp
+   * Sắp xếp theo:
+
+     * Mã sinh viên
+     * Họ tên
+     * Tăng dần / Giảm dần
+   * Phân trang danh sách.
+   * Tùy chọn số bản ghi trên mỗi trang.
+
+3. Quản lý lớp học
+
+   * Xem danh sách lớp học.
+   * Thêm lớp học.
+   * Sửa thông tin lớp học.
+   * Xóa lớp học.
+   * Tìm kiếm theo:
+
+     * Mã lớp
+     * Tên lớp
+     * Ghi chú
+   * Sắp xếp dữ liệu.
+   * Phân trang danh sách.
+   * Tùy chọn số bản ghi trên mỗi trang.
+
+
 
 

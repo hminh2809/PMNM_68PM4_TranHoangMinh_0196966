@@ -1,5 +1,5 @@
 <?php
-require_once '../app/core/DB.php';
+require_once __DIR__ . "/../core/DB.php";
 class SinhvienModel{
     private $conn;
 
@@ -14,12 +14,13 @@ class SinhvienModel{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function create($hoten, $gioitinh, $mssv){
-        $query = "INSERT INTO tbl_sinhviens(hoten, gioitinh, mssv) VALUES(:hoten, :gioitinh, :mssv)";
+    public function create($hoten, $gioitinh, $mssv, $malop){
+        $query = "INSERT INTO tbl_sinhviens(hoten, gioitinh, mssv, malop) VALUES(:hoten, :gioitinh, :mssv, :malop)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':hoten', $hoten);
         $stmt->bindParam(':gioitinh', $gioitinh);
         $stmt->bindParam(':mssv', $mssv);
+        $stmt->bindParam(':malop', $malop);
         if($stmt->execute()){
             return true;
         }else{
@@ -27,29 +28,70 @@ class SinhvienModel{
         }
     }
 
-    public function paging($limit = 5, $offset = 0, $search = ""){
-        $query = "SELECT * FROM tbl_sinhviens LIMIT :limit OFFSET :offset";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    public function paging($limit = 5, $offset = 0, $search = "", $sort = "id", $dir = "ASC"){
 
-        /*
-        $query = "SELECT * FROM tbl_sinhviens LIMIT ? OFFSET ?";
-        $stmt->bindParam('ss', $limit, $offset);
-        */
+    $where = "";
+    $searchValue = "%" . $search . "%";
 
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $allowedSort = [
+    "id" => "sv.id",
+    "mssv" => "sv.mssv",
+    "hoten" => "SUBSTRING_INDEX(sv.hoten, ' ', -1)"
+];
 
-        //Tinh tong so ban ghi
-        $selectAllQuery = $this->conn->query("SELECT COUNT(*) FROM tbl_sinhviens");
-        $totalRecord = $selectAllQuery->fetchColumn();
+    $orderBy = $allowedSort[$sort] ?? "sv.id";
+    $dir = strtoupper($dir) === "DESC" ? "DESC" : "ASC";
 
-        $totalPage = ceil($totalRecord/$limit);
-
-        return ["sinhviens"=>$result, "totalpage"=>$totalPage];
+    if (!empty($search)) {
+        $where = "WHERE sv.hoten LIKE :search 
+                  OR sv.mssv LIKE :search 
+                  OR sv.malop LIKE :search 
+                  OR l.tenlop LIKE :search";
     }
 
+    $query = "
+        SELECT sv.*, l.tenlop
+        FROM tbl_sinhviens sv
+        LEFT JOIN tbl_lops l ON sv.malop = l.malop
+        $where
+        ORDER BY $orderBy $dir
+        LIMIT :limit OFFSET :offset
+    ";
+
+    $stmt = $this->conn->prepare($query);
+
+    if (!empty($search)) {
+        $stmt->bindParam(':search', $searchValue);
+    }
+
+    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $countQuery = "
+        SELECT COUNT(*)
+        FROM tbl_sinhviens sv
+        LEFT JOIN tbl_lops l ON sv.malop = l.malop
+        $where
+    ";
+
+    $countStmt = $this->conn->prepare($countQuery);
+
+    if (!empty($search)) {
+        $countStmt->bindParam(':search', $searchValue);
+    }
+
+    $countStmt->execute();
+    $totalRecord = $countStmt->fetchColumn();
+
+        return [
+            "sinhviens" => $result,
+            "totalpage" => ceil($totalRecord / $limit)
+        ];
+    }
+    
     public function getById($id){
         $query = "SELECT * FROM tbl_sinhviens WHERE id = :id";
         $stmt = $this->conn->prepare($query);
@@ -58,13 +100,14 @@ class SinhvienModel{
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $hoten, $gioitinh, $mssv){
-        $query = "UPDATE tbl_sinhviens SET hoten = :hoten, gioitinh = :gioitinh, mssv = :mssv WHERE id = :id";
+    public function update($id, $hoten, $gioitinh, $mssv, $malop){
+        $query = "UPDATE tbl_sinhviens SET hoten = :hoten, gioitinh = :gioitinh, mssv = :mssv, malop = :malop WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->bindParam(':hoten', $hoten);
         $stmt->bindParam(':gioitinh', $gioitinh);
         $stmt->bindParam(':mssv', $mssv);
+        $stmt->bindParam(':malop', $malop);
         if($stmt->execute()){
             return true;
         }else{

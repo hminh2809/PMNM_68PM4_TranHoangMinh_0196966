@@ -1,18 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $title ?></title>
-    <style>
-        .header{
-            width: 100%;
-            height: 80px;
-            background-color: red;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">  </div>
-</body>
-</html>
+<?php
+$currentUrl = $_GET['url'] ?? '';
+
+$isSinhVien = strpos($currentUrl, 'sinhvien') === 0;
+$isLop = strpos($currentUrl, 'lop') === 0;
+?>
+
+<nav class="navbar navbar-expand-lg app-navbar sticky-top">
+    <div class="container-fluid app-shell">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="/PMNM_68PM4_TranHoangMinh_0196966/public/home/index/">
+            <span class="brand-mark">SV</span>
+            <span>Student Manager</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $isSinhVien ? 'active' : ''; ?>" href="/PMNM_68PM4_TranHoangMinh_0196966/public/sinhvien/index/">
+                        Quản lý sinh viên
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo $isLop ? 'active' : ''; ?>" href="/PMNM_68PM4_TranHoangMinh_0196966/public/lop/index/">
+                        Quản lý lớp học
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary ms-lg-2" href="/PMNM_68PM4_TranHoangMinh_0196966/public/auth/logout/">
+                        Đăng xuất
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,13 +1,12 @@
 <?php
-class home {
+require_once __DIR__ . "/../core/Controller.php";
+
+class home extends Controller{
     public function index(){
-        echo "Day la trang chu";
-    }
-    public function create(){
-        echo "Day la trang tao moi";
+
+         $this->view('layout/masterlayout', ['viewname' => 'home/index']);
     }
     public function login(){
-        require_once '../app/views/auth/Login.php';
+        $this->view('home/login');
     }
 }
-?>

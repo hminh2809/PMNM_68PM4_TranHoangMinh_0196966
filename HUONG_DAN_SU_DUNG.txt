@@ -1,0 +1,23 @@
+HƯỚNG DẪN CHẠY CHƯƠNG TRÌNH
+
+1. Copy thư mục PMNM_68PM4_TranHoangMinh_0196966 vào htdocs của XAMPP.
+
+2. Mở phpMyAdmin.
+
+3. Tạo database:
+   68pm34
+
+4. Import file:
+   68pm34.sql
+
+5. Khởi động Apache và MySQL.
+
+6. Truy cập:
+   http://localhost/PMNM_68PM4_TranHoangMinh_0196966/public/
+
+Tài khoản đăng nhập:
+
+* Username: admin
+* Password: 123456
+
+

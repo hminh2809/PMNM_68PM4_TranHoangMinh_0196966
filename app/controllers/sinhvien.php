@@ -1,17 +1,55 @@
 <?php
-require_once '../app/core/controller.php';
+require_once __DIR__ . "/../core/Controller.php";
 class sinhvien extends Controller{
 
-    public function index($limit = 5, $offset = 0, $search=""){
+    public function index($limit = 5, $offset = 0, $search = ""){
+        $search = trim($_GET['search'] ?? $search);
+        $sort = $_GET['sort'] ?? 'id';
+        $dir = $_GET['dir'] ?? 'ASC';
+
+        $pageSize = (int)($_GET['pageSize'] ?? $limit);
+        $allowedPageSizes = [5, 10, 20, 50];
+
+        if (!in_array($pageSize, $allowedPageSizes)) {
+            $pageSize = 5;
+        }
+
+        $limit = $pageSize;
+        $offset = (int)$offset;
+
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
         $sinhvienModel = $this->model('sinhvienModel');
-        $result = $sinhvienModel->paging($limit, $offset, $search);
+        $result = $sinhvienModel->paging($limit, $offset, $search, $sort, $dir);
+
         $sinhviens = $result['sinhviens'];
         $totalpage = $result['totalpage'];
-        $this->view('layout/masterlayout', ['viewname' => 'sinhvien/index', 'sinhviens' => $sinhviens, 'title' => 'Danh sách sinh viên', 'totalpage'=>$totalpage]);
-    }
+        $currentPage = floor($offset / $limit) + 1;
 
+        $this->view('layout/masterlayout', [
+            'viewname' => 'sinhvien/index',
+            'sinhviens' => $sinhviens,
+            'title' => 'Danh sách sinh viên',
+            'totalpage' => $totalpage,
+            'limit' => $limit,
+            'offset' => $offset,
+            'currentPage' => $currentPage,
+            'search' => $search,
+            'sort' => $sort,
+            'dir' => $dir,
+            'pageSize' => $pageSize
+        ]);
+    }
+    
     public function create(){
-        $this->view('sinhvien/create');
+        $lopModel = $this->model('lopModel');
+        $lops = $lopModel->getAllLop();
+
+        $this->view('sinhvien/create', [
+            'lops' => $lops
+        ]);
     }
 
     public function store(){
@@ -19,10 +57,12 @@ class sinhvien extends Controller{
             $hoten = $_POST['hoten'] ??'';
             $gioitinh = $_POST['gioitinh'] ??'';
             $mssv = $_POST['mssv'] ??'';
+            $malop = $_POST['malop'] ??'';
             $sinhvienModel = $this->model('sinhvienModel');
-            $result = $sinhvienModel->create($hoten, $gioitinh, $mssv);
+            $result = $sinhvienModel->create($hoten, $gioitinh, $mssv, $malop);
             if($result){
-                echo "Thêm mới thành công";
+                header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/sinhvien/index");
+                exit();
             }else{
                 echo "Thêm mới thất bại";
             }
@@ -32,7 +72,14 @@ class sinhvien extends Controller{
     public function edit($id){
         $sinhvienModel = $this->model('sinhvienModel');
         $sinhvien = $sinhvienModel->getById($id);
-        $this->view('sinhvien/edit', ['sinhvien' => $sinhvien]);
+
+        $lopModel = $this->model('lopModel');
+        $lops = $lopModel->getAllLop();
+
+        $this->view('sinhvien/edit', [
+            'sinhvien' => $sinhvien,
+            'lops' => $lops
+        ]);
     }
 
     public function update($id){
@@ -40,10 +87,12 @@ class sinhvien extends Controller{
             $hoten = $_POST['hoten'] ??'';
             $gioitinh = $_POST['gioitinh'] ??'';
             $mssv = $_POST['mssv'] ??'';
+            $malop = $_POST['malop'] ??'';
             $sinhvienModel = $this->model('sinhvienModel');
-            $result = $sinhvienModel->update($id, $hoten, $gioitinh, $mssv);
+            $result = $sinhvienModel->update($id, $hoten, $gioitinh, $mssv, $malop);
             if($result){
-                echo "Cập nhật thành công";
+                header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/sinhvien/index");
+                exit();
             }else{
                 echo "Cập nhật thất bại";
             }
@@ -54,7 +103,8 @@ class sinhvien extends Controller{
         $sinhvienModel = $this->model('sinhvienModel');
         $result = $sinhvienModel->delete($id);
         if($result){
-            echo "Xóa thành công";
+            header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/sinhvien/index");
+            exit();
         }else{
             echo "Xóa thất bại";
         }

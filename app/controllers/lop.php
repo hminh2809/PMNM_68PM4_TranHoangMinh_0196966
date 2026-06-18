@@ -1,0 +1,104 @@
+<?php
+require_once __DIR__ . "/../core/Controller.php";
+class lop extends Controller{
+
+    public function index($limit = 5, $offset = 0, $search = ""){
+        $search = trim($_GET['search'] ?? $search);
+        $sort = $_GET['sort'] ?? 'id';
+        $dir = $_GET['dir'] ?? 'ASC';
+
+        $pageSize = (int)($_GET['pageSize'] ?? $limit);
+        $allowedPageSizes = [5, 10, 20, 50];
+
+        if (!in_array($pageSize, $allowedPageSizes)) {
+            $pageSize = 5;
+        }
+
+        $limit = $pageSize;
+        $offset = (int)$offset;
+
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        $lopModel = $this->model('lopModel');
+        $result = $lopModel->paging($limit, $offset, $search, $sort, $dir);
+
+        $lops = $result['lops'];
+        $totalpage = $result['totalpage'];
+        $currentPage = floor($offset / $limit) + 1;
+
+        $this->view('layout/masterlayout', [
+            'viewname' => 'lop/index',
+            'lops' => $lops,
+            'title' => 'Danh sách lớp',
+            'totalpage' => $totalpage,
+            'limit' => $limit,
+            'offset' => $offset,
+            'currentPage' => $currentPage,
+            'search' => $search,
+            'sort' => $sort,
+            'dir' => $dir,
+            'pageSize' => $pageSize
+        ]);
+    }
+
+    public function create(){
+        $this->view('lop/create');
+    }
+
+    public function store(){
+        if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+            $malop = trim($_POST['malop'] ?? '');
+            $tenlop = trim($_POST['tenlop'] ?? '');
+            $ghichu = trim($_POST['ghichu'] ?? '');
+
+            $lopModel = $this->model('lopModel');
+            $result = $lopModel->create($malop, $tenlop, $ghichu);
+
+            if($result === true){
+                header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/lop/index");
+                exit();
+            }
+
+            if($result === "duplicate_malop"){
+                echo "Mã lớp đã tồn tại. Vui lòng nhập mã lớp khác.";
+                return;
+            }
+
+            echo "Thêm mới thất bại";
+        }
+    }
+
+    public function edit($id){
+        $lopModel = $this->model('lopModel');
+        $lop = $lopModel->getById($id);
+        $this->view('lop/edit', ['lop' => $lop]);
+    }
+
+    public function update($id){
+        if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST'){
+            $malop = $_POST['malop'] ??'';
+            $tenlop = $_POST['tenlop'] ??'';
+            $ghichu = $_POST['ghichu'] ??'';
+            $lopModel = $this->model('lopModel');
+            $result = $lopModel->update($id, $malop, $tenlop, $ghichu);
+            if($result){
+                header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/lop/index");
+            }else{
+                echo "Cập nhật thất bại";
+            }
+        }
+    }
+
+    public function delete($id){
+        $lopModel = $this->model('lopModel');
+        $result = $lopModel->delete($id);
+        if($result){
+            header("Location: /PMNM_68PM4_TranHoangMinh_0196966/public/lop/index");
+        }else{
+            echo "Xóa thất bại";
+        }
+    }
+}
+?>
